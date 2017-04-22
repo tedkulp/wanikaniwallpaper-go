@@ -8,7 +8,7 @@ import "io/ioutil"
 import "container/list"
 
 func GetKanjiForApiKey(key string) *list.List {
-	url := "http://www.wanikani.com/api/user/" + key + "/kanji"
+	url := "https://www.wanikani.com/api/user/" + key + "/kanji"
 	fmt.Println("Getting kanji for url " + url)
 
 	response, err := http.Get(url)
@@ -32,10 +32,10 @@ func GetKanjiForApiKey(key string) *list.List {
 				for i := range(v.([]interface{})) {
 					data := v.([]interface{})[i].(map[string]interface{})
 					character := data["character"].(string) 
-					if data["stats"] == nil {
+					if data["user_specific"] == nil {
 						continue
 					}
-					stats := data["stats"].(map[string]interface{})
+					stats := data["user_specific"].(map[string]interface{})
 					srs := stats["srs"].(string)
 					kanjiStats := KanjiStats { srs }
 					kanji := Kanji { character, kanjiStats.Status() }

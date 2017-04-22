@@ -9,8 +9,9 @@ import (
 	"image/color"
 	"image/draw"
 	"image/png"
-	"code.google.com/p/freetype-go/freetype"
-	"code.google.com/p/freetype-go/freetype/truetype"
+	"github.com/golang/freetype"
+	"github.com/golang/freetype/truetype"
+	"golang.org/x/image/math/fixed"
 )
 
 var (
@@ -18,7 +19,7 @@ var (
 	fontfile = flag.String("fontfile", "font/ipag.ttf", "filename of the ttf font")
 	size     = flag.Float64("size", 12, "font size in points")
 	width 	 = flag.Int("width", 1920, "width of wallpaper")
-	height 	 = flag.Int("height", 1200, "height of wallpaper")
+	height 	 = flag.Int("height", 1080, "height of wallpaper")
 )
 
 type Renderer struct {
@@ -44,6 +45,10 @@ func NewRenderer() *Renderer {
 	return &r
 }
 
+func PointToInt26_6(x, dpi float64) fixed.Int26_6 {
+	return fixed.Int26_6(x * dpi * (64.0 / 72.0))
+}
+
 func (r *Renderer) SetFontSize(size int) {
 	r.context.SetFontSize(float64(size))
 	r.fontsize = float64(size)
@@ -51,7 +56,7 @@ func (r *Renderer) SetFontSize(size int) {
 
 func (r *Renderer) DrawKanji(kanji *Kanji, x int, y int) {
 	pt := freetype.Pt(x, y - int(r.fontsize / 10.0))
-	pt.Y += r.context.PointToFix32(r.fontsize)
+	pt.Y += PointToInt26_6(r.fontsize, *dpi)
 	r.context.SetSrc(&image.Uniform{ kanji.Color() })
 
 	for _, s := range kanji.character {
