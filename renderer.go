@@ -1,36 +1,36 @@
 package main
 
 import (
-	"os"
-	"flag"
 	"bufio"
-	"io/ioutil"
+	"flag"
+	"github.com/golang/freetype"
+	"github.com/golang/freetype/truetype"
+	"golang.org/x/image/math/fixed"
 	"image"
 	"image/color"
 	"image/draw"
 	"image/png"
-	"github.com/golang/freetype"
-	"github.com/golang/freetype/truetype"
-	"golang.org/x/image/math/fixed"
+	"io/ioutil"
+	"os"
 )
 
 var (
 	dpi      = flag.Float64("dpi", 72, "screen resolution in Dots Per Inch")
 	fontfile = flag.String("fontfile", "font/ipag.ttf", "filename of the ttf font")
 	size     = flag.Float64("size", 12, "font size in points")
-	width 	 = flag.Int("width", 1920, "width of wallpaper")
-	height 	 = flag.Int("height", 1080, "height of wallpaper")
+	width    = flag.Int("width", 1920, "width of wallpaper")
+	height   = flag.Int("height", 1080, "height of wallpaper")
 )
 
 type Renderer struct {
-	context *freetype.Context
-	img draw.Image
-	font *truetype.Font
+	context  *freetype.Context
+	img      draw.Image
+	font     *truetype.Font
 	fontsize float64
 }
 
 func NewRenderer() *Renderer {
-	r := Renderer {  }
+	r := Renderer{}
 	fontBytes, _ := ioutil.ReadFile(*fontfile)
 	r.font, _ = freetype.ParseFont(fontBytes)
 	r.img = image.NewRGBA(image.Rect(0, 0, *width, *height))
@@ -39,7 +39,7 @@ func NewRenderer() *Renderer {
 	r.context.SetFont(r.font)
 	r.context.SetFontSize(*size)
 	r.context.SetClip(r.img.Bounds())
-	draw.Draw(r.img, r.img.Bounds(), &image.Uniform{ color.RGBA{ 0, 0, 0, 255 } }, image.ZP, draw.Src)
+	draw.Draw(r.img, r.img.Bounds(), &image.Uniform{color.RGBA{0, 0, 0, 255}}, image.ZP, draw.Src)
 	r.context.SetDst(r.img)
 
 	return &r
@@ -55,9 +55,9 @@ func (r *Renderer) SetFontSize(size int) {
 }
 
 func (r *Renderer) DrawKanji(kanji *Kanji, x int, y int) {
-	pt := freetype.Pt(x, y - int(r.fontsize / 10.0))
+	pt := freetype.Pt(x, y-int(r.fontsize/10.0))
 	pt.Y += PointToInt26_6(r.fontsize, *dpi)
-	r.context.SetSrc(&image.Uniform{ kanji.Color() })
+	r.context.SetSrc(&image.Uniform{kanji.Color()})
 
 	for _, s := range kanji.character {
 		r.context.DrawString(string(s), pt)

@@ -22,7 +22,7 @@ func WastedSpace(width int, height int, num int, ratio float64) (int, float64) {
 	var wasted float64
 	var area float64
 	if contentRatio > ratio {
-		wasted = (1.0 / ratio - 1.0 / contentRatio) * ratio
+		wasted = (1.0/ratio - 1.0/contentRatio) * ratio
 		cwidth := 1.0 / float64(width)
 		area = cwidth * cwidth * ratio
 	} else {
@@ -31,8 +31,8 @@ func WastedSpace(width int, height int, num int, ratio float64) (int, float64) {
 		area = (cheight * cheight) / ratio
 	}
 
-	missing := float64(width * height - num)
-	wasted = wasted + missing * area
+	missing := float64(width*height - num)
+	wasted = wasted + missing*area
 
 	return height, wasted
 }
@@ -57,7 +57,9 @@ func FindBest(num int, ratio float64) (int, int, float64) {
 	return bestWidth, bestHeight, bestWasted
 }
 
-func Draw(order *Order, renderer *Renderer, width int, height int) {
+func Draw(order *Order, renderer *Renderer, width int, height int, xmargin int, ymargin int) {
+	width = width - (xmargin * 2)
+	height = height - (ymargin * 2)
 	ratio := float64(width) / float64(height)
 	w, h, _ := FindBest(order.Size(), ratio)
 
@@ -78,8 +80,8 @@ func Draw(order *Order, renderer *Renderer, width int, height int) {
 		div := i / w
 		dx := float64(mod) * gridwidth
 		dy := float64(div) * gridheight
-		x := int(dx)
-		y := int(dy)
+		x := int(dx) + xmargin
+		y := int(dy) + ymargin
 
 		fmt.Println(x, "/", y)
 		renderer.DrawKanji(order.KanjiForPosition(i), x, y)
